@@ -864,6 +864,21 @@ body.lightbox-open nav {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
 }
+
+        /* Esconde elementos flutuantes quando o lightbox está aberto */
+body.lightbox-open .commission-status,
+body.lightbox-open .back-to-top,
+body.lightbox-open .progress-container {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: all 0.3s ease;
+}
+
+/* Garante que o lightbox fique acima de tudo */
+.lightbox {
+    z-index: 9999 !important;
+}
     </style>
 </head>
 <body>
