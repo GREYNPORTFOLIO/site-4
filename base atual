@@ -2067,6 +2067,167 @@ footer .logo-text {
   letter-spacing: 0.5px;
   pointer-events: none;
 }
+
+/* ===== CARROSSEL DE COMMISSIONS (MOBILE) ===== */
+.commissions-dots {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .commissions-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    gap: 16px !important;
+    padding: 8px 4px 16px !important;
+    margin-inline: -16px !important;
+    padding-inline: 16px !important;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .commissions-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .commissions-grid > .commission-card {
+    flex: 0 0 84% !important;
+    min-width: 0 !important;
+    scroll-snap-align: start;
+    margin: 0 !important;
+  }
+
+  .commissions-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 4px 0 12px;
+    list-style: none;
+    padding: 0;
+  }
+
+  .commissions-dots button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+
+  .commissions-dots button::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f3edd8;
+    opacity: 0.35;
+    transition: opacity 0.2s, width 0.2s, border-radius 0.2s;
+  }
+
+  .commissions-dots button[aria-current="true"]::before {
+    opacity: 1;
+    width: 22px;
+    border-radius: 4px;
+  }
+}
+
+/* ===== CONTROLE DE MÚSICA + VOLUME ===== */
+.music-controls {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 8px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 42, 109, 0.55);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+#musicToggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 42, 109, 0.7);
+  background: rgba(10, 10, 10, 0.85);
+  color: #ff2a6d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+#musicToggle:hover {
+  background: #ff2a6d;
+  color: #fff;
+}
+
+#musicVolume {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: width 0.25s ease, opacity 0.25s ease;
+  accent-color: #ff2a6d;
+  height: 6px;
+  cursor: pointer;
+}
+
+/* No hover/focus mostra o slider */
+.music-controls:hover #musicVolume,
+.music-controls:focus-within #musicVolume {
+  width: 110px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
+  .music-controls {
+    bottom: 18px;
+    left: 14px;
+    padding: 6px 10px 6px 6px;
+  }
+  #musicToggle {
+    width: 40px;
+    height: 40px;
+  }
+  .music-controls:hover #musicVolume,
+  .music-controls:focus-within #musicVolume {
+    width: 90px;
+  }
+}
+
+/* Esconde o status de commissions quando o menu mobile está aberto */
+body.mobile-menu-open .commission-status {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+/* Garante que o menu fique acima do status */
+.site-header {
+  z-index: 120 !important;
+}
+
+.mobile-nav {
+  z-index: 119 !important;
+}
+
+.commission-status {
+  z-index: 90 !important; /* abaixo do menu */
+}
     </style>
   </head>
 <body>
@@ -2077,14 +2238,22 @@ footer .logo-text {
 </video>
 <div class="site-bg-overlay"></div>
 
-<!-- Música de fundo --><audio id="bgMusic" loop autoplay preload="auto">
-    <source src="https://raw.githubusercontent.com/GREYNPORTFOLIO/site/f7a7ff36cf8b774a87815695c99278aa3e5506be/Saga%20of%20Tanya%20the%20Evil%20Season%202%20-%20Ending%20FULL%20_Weiter_%20Weiter__%20by%20Aoi%20Yuuki%20(Lyrics)(MP3_160K).mp3" type="audio/mpeg" > 
-</audio>
+<!-- Música de fundo --><audio id="bgMusic" preload="auto"></audio>
 
 <!-- Botão de controle da música -->
-<button id="musicToggle" class="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-black/70 border border-neonpink text-neonpink hover:bg-neonpink hover:text-white transition-all duration-300 flex items-center justify-center shadow-lg">
+<div id="musicControls" class="music-controls">
+  <button id="musicToggle" type="button" aria-label="Play/Pause música">
     <i class="fas fa-music text-lg" id="musicIcon"></i>
-</button>
+  </button>
+  <input
+    type="range"
+    id="musicVolume"
+    min="0"
+    max="100"
+    value="5"
+    aria-label="Volume da música"
+  >
+</div>
 
 <!-- Commission Status Indicator --><div class="commission-status animate__animated animate__fadeInDown animate__delay-1s" id="commissionStatus">
     <div class="status-dot" id="statusDot"></div>
@@ -2195,9 +2364,10 @@ footer .logo-text {
 <a href="https://www.reddit.com/user/Glad-Stress8327/" target="_blank" class="social-icon text-2xl text-orange-500 hover:text-white tooltip">
     <i class="fab fa-reddit-alien"></i>
 </a></div>
-</section>
 
-<section id="projects" class="projects-section">
+<hr class="section-divider">
+
+ <section id="projects" class="projects-section">
     <div class="container mx-auto px-4 mb-12 text-center">
         <p class="text-sm uppercase tracking-widest text-neonpink mb-2 font-semibold">▢ SELECTED WORK</p>
         <h2 class="text-4xl md:text-5xl font-bold mb-3" style="color:#f3edd8;">PROJECTS I WORKED ON</h2>
@@ -2266,7 +2436,6 @@ footer .logo-text {
   <button type="button" aria-label="Projeto 2"></button>
   <button type="button" aria-label="Projeto 3"></button>
 </div>
-</section>
 
 <!-- PARA QUEM -->
 <section class="paper-sec" id="for-who">
@@ -2367,16 +2536,16 @@ footer .logo-text {
         <!-- Gallery Grid -->
              <div id="gallery-grid">
                 <!-- Illustrations  -->
-<div class="gallery-item illustrations"
-     data-src="https://raw.githubusercontent.com/GREYNPORTFOLIO/site-2/refs/heads/main/FANART%2C%20BOCCHI%20THE%20ROCK%2C%20HITORI%20GOTOH%206%20.png"
-     data-process="Sketch| ;; Lineart| ;; Base colors|">
-    <div class="art-badge badge-sfw">SFW</div>
-    <img src="https://raw.githubusercontent.com/GREYNPORTFOLIO/site-2/refs/heads/main/FANART%2C%20BOCCHI%20THE%20ROCK%2C%20HITORI%20GOTOH%206%20.png" alt="Illustration" class="w-full h-auto rounded-lg cursor-pointer">
-    <div class="gallery-caption">
-        <p class="text-white font-medium">Illustration</p>
-        <p class="text-gray-300 text-sm">BOCCHI THE ROCK</p>
-    </div>
-</div>
+             <div class="gallery-item illustrations"
+               data-src="https://raw.githubusercontent.com/GREYNPORTFOLIO/site-2/refs/heads/main/FANART%2C%20BOCCHI%20THE%20ROCK%2C%20HITORI%20GOTOH%206%20.png"
+                   data-process="FULL-BODY ILLUSTRATION WITH NO BACKGROUND|https://raw.githubusercontent.com/GREYNPORTFOLIO/site-2/refs/heads/main/FANART%2C%20BOCCHI%20THE%20ROCK%2C%20HITORI%20GOTOH%207-1.png ;; GIF ART|https://raw.githubusercontent.com/GREYNPORTFOLIO/site-2/refs/heads/main/FANART%2C%20BOCCHI%20THE%20ROCK%2C%20HITORI%20GOTOH%20GIF.gif ;; ART PROCESS|https://raw.githubusercontent.com/GREYNPORTFOLIO/site-2/refs/heads/main/FANART%2C%20BOCCHI%20THE%20ROCK%2C%20HITORI%20GOTOH%200.jpg">
+                    <div class="art-badge badge-sfw">SFW</div>
+                    <img src="https://raw.githubusercontent.com/GREYNPORTFOLIO/site-2/refs/heads/main/FANART%2C%20BOCCHI%20THE%20ROCK%2C%20HITORI%20GOTOH%206%20.png" alt="Illustration" class="w-full h-auto rounded-lg cursor-pointer">
+                    <div class="gallery-caption">
+                        <p class="text-white font-medium">Illustration</p>
+                        <p class="text-gray-300 text-sm">BOCCHI THE ROCK</p>
+                    </div>
+                </div>
 
                  <!-- Illustrations  -->
                 <div class="gallery-item illustrations" data-src="https://raw.githubusercontent.com/GREYNPORTFOLIO/site-2/refs/heads/main/fase%204%20Dragon%20child.png">
@@ -2680,6 +2849,7 @@ footer .logo-text {
             </div>
         </div>
     </section>      
+    <hr class="section-divider">
 
 <!-- Art Process Section -->
 <section id="process" class="py-20 bg-darker/50 backdrop-blur-sm">
@@ -2875,7 +3045,7 @@ footer .logo-text {
         </div>
         
         <div class="max-w-5xl mx-auto">
-            <div class="grid md:grid-cols-3 gap-8 mb-12">
+            <div class="commissions-grid grid md:grid-cols-3 gap-8 mb-12">
 
     <!-- Sketch -->
     <div class="commission-card flex flex-col">
@@ -2940,6 +3110,12 @@ footer .logo-text {
         </div>
     </div>
 
+</div>
+
+<div class="commissions-dots" role="group" aria-label="Navegar pelas commissions">
+  <button type="button" aria-label="Sketch" aria-current="true"></button>
+  <button type="button" aria-label="Flat Color"></button>
+  <button type="button" aria-label="Full Render"></button>
 </div>
             
             <div class="bg-gray-900/50 p-6 rounded-lg mb-8">
@@ -3148,9 +3324,11 @@ if (menuToggle && mobileNav) {
     if (isHidden) {
       mobileNav.removeAttribute('hidden');
       menuToggle.textContent = '×';
+      document.body.classList.add('mobile-menu-open');
     } else {
       mobileNav.setAttribute('hidden', '');
       menuToggle.textContent = '☰';
+      document.body.classList.remove('mobile-menu-open');
     }
   });
 
@@ -3159,19 +3337,10 @@ if (menuToggle && mobileNav) {
     link.addEventListener('click', () => {
       mobileNav.setAttribute('hidden', '');
       menuToggle.textContent = '☰';
+      document.body.classList.remove('mobile-menu-open');
     });
   });
 }
-    
-    // Close mobile menu when clicking on a link
-    document.querySelectorAll('#mobileMenu a').forEach(link => {
-        link.addEventListener('click', function() {
-            mobileMenu.classList.add('translate-x-full');
-            setTimeout(() => {
-                mobileMenu.classList.add('hidden');
-            }, 300);
-        });
-    });
 
        // ==========================================
 //  CONTROLE DE COMISSÕES (só mude esta linha)
@@ -3738,31 +3907,133 @@ document.querySelectorAll('.gallery-item img').forEach(img => {
     }
 });
 
-// ========== MÚSICA DE FUNDO ==========
-const bgMusic = document.getElementById('bgMusic');
-const musicToggle = document.getElementById('musicToggle');
-const musicIcon = document.getElementById('musicIcon');
-let isPlaying = false;
+// ========== MÚSICA DE FUNDO: PLAYLIST + SHUFFLE + VOLUME ==========
+(function () {
+  const bgMusic = document.getElementById('bgMusic');
+  const musicToggle = document.getElementById('musicToggle');
+  const musicIcon = document.getElementById('musicIcon');
+  const musicVolume = document.getElementById('musicVolume');
 
-// Volume inicial (0.0 até 1.0)
-bgMusic.volume = 0.01;
+  if (!bgMusic || !musicToggle || !musicIcon) return;
 
-musicToggle.addEventListener('click', function() {
-    if (!isPlaying) {
-        bgMusic.play().then(() => {
-            isPlaying = true;
-            musicIcon.classList.remove('fa-music');
-            musicIcon.classList.add('fa-pause');
-        }).catch(err => {
-            console.log('Erro ao tocar música:', err);
-        });
-    } else {
-        bgMusic.pause();
-        isPlaying = false;
-        musicIcon.classList.remove('fa-pause');
-        musicIcon.classList.add('fa-music');
+  // >>> COLOQUE AQUI AS URLS DAS MÚSICAS <<<
+  const playlist = [
+  'https://raw.githubusercontent.com/GREYNPORTFOLIO/site/f7a7ff36cf8b774a87815695c99278aa3e5506be/Saga%20of%20Tanya%20the%20Evil%20Season%202%20-%20Ending%20FULL%20_Weiter_%20Weiter__%20by%20Aoi%20Yuuki%20(Lyrics)(MP3_160K).mp3',
+
+  'https://raw.githubusercontent.com/GREYNPORTFOLIO/site/3bf20600cd3dc746219d7807cbb147d06f44714f/Babydoll%20X%20The%20perfect%20girl%20(%20full%20version)(MP3_320K).mp3',
+
+  'https://raw.githubusercontent.com/GREYNPORTFOLIO/site/3bf20600cd3dc746219d7807cbb147d06f44714f/%E3%80%90Ado%E3%80%91CAT_S%20EYE%EF%BC%88Official%20Audio%EF%BC%89(MP3_160K).mp3',
+];
+
+  let queue = [];
+  let currentIndex = 0;
+  let isPlaying = false;
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
-});
+    return a;
+  }
+
+  function setPlayingUI(playing) {
+    isPlaying = playing;
+    if (playing) {
+      musicIcon.classList.remove('fa-music');
+      musicIcon.classList.add('fa-pause');
+    } else {
+      musicIcon.classList.remove('fa-pause');
+      musicIcon.classList.add('fa-music');
+    }
+  }
+
+  function loadTrack(index) {
+    if (!queue.length) return;
+    currentIndex = ((index % queue.length) + queue.length) % queue.length;
+    bgMusic.src = queue[currentIndex];
+    bgMusic.load();
+  }
+
+  function playCurrent() {
+    return bgMusic.play().then(() => {
+      setPlayingUI(true);
+    }).catch(() => {
+      // autoplay bloqueado pelo navegador
+      setPlayingUI(false);
+    });
+  }
+
+  function startPlaylist() {
+    if (!playlist.length) return;
+    queue = shuffle(playlist);
+    currentIndex = 0;
+    loadTrack(0);
+    playCurrent();
+  }
+
+  function nextTrack() {
+    if (!queue.length) {
+      startPlaylist();
+      return;
+    }
+    loadTrack(currentIndex + 1);
+    playCurrent();
+  }
+
+  // volume inicial
+  if (musicVolume) {
+    bgMusic.volume = Number(musicVolume.value) / 100;
+    musicVolume.addEventListener('input', function () {
+      bgMusic.volume = Number(this.value) / 100;
+    });
+  } else {
+    bgMusic.volume = 0.15;
+  }
+
+  // quando a música acaba → próxima
+  bgMusic.addEventListener('ended', nextTrack);
+
+  // sincroniza ícone se o áudio pausar/tocar por outros meios
+  bgMusic.addEventListener('play', () => setPlayingUI(true));
+  bgMusic.addEventListener('pause', () => {
+    // não troca ícone no fim da faixa (antes do next), só se realmente pausou
+    if (bgMusic.ended) return;
+    setPlayingUI(false);
+  });
+
+  // botão play/pause
+  musicToggle.addEventListener('click', function () {
+    if (!queue.length) {
+      startPlaylist();
+      return;
+    }
+
+    if (bgMusic.paused) {
+      playCurrent();
+    } else {
+      bgMusic.pause();
+      setPlayingUI(false);
+    }
+  });
+
+  // tenta autoplay ao carregar (pode ser bloqueado)
+  // se o navegador bloquear, o ícone fica de música até o 1º clique
+  window.addEventListener('load', function () {
+    startPlaylist();
+  });
+
+  // fallback: primeiro clique em qualquer lugar destrava o áudio
+  function unlockAudio() {
+    if (!queue.length) startPlaylist();
+    else if (bgMusic.paused) playCurrent();
+    document.removeEventListener('click', unlockAudio);
+    document.removeEventListener('touchstart', unlockAudio);
+  }
+  document.addEventListener('click', unlockAudio, { once: true });
+  document.addEventListener('touchstart', unlockAudio, { once: true });
+})();
 
 // ========== BEFORE/AFTER SLIDER ==========
 function initBaSlider(id) {
@@ -3950,5 +4221,35 @@ window.addEventListener('scroll', function() {
   bottomBtn.addEventListener('click', () => {
     window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
   });
+})();
+
+// ===== CARROSSEL DE COMMISSIONS =====
+(function() {
+  const grid = document.querySelector('.commissions-grid');
+  const dots = document.querySelectorAll('.commissions-dots button');
+  if (!grid || !dots.length) return;
+
+  const cards = grid.querySelectorAll('.commission-card');
+  if (!cards.length) return;
+
+  function updateDots() {
+    const scrollLeft = grid.scrollLeft;
+    const cardWidth = cards[0].offsetWidth + 16;
+    const index = Math.round(scrollLeft / cardWidth);
+    dots.forEach((dot, i) => {
+      dot.setAttribute('aria-current', i === index ? 'true' : 'false');
+    });
+  }
+
+  grid.addEventListener('scroll', () => requestAnimationFrame(updateDots), { passive: true });
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      const cardWidth = cards[0].offsetWidth + 16;
+      grid.scrollTo({ left: i * cardWidth, behavior: 'smooth' });
+    });
+  });
+
+  updateDots();
 })();
 </script>
